@@ -31,10 +31,10 @@ app.get('/api/users/:username/:password', (req, res) => {
     var datetime = new Date();
     console.log("\n" + datetime);
     console.log("Incoming new GET HTTP request for LOGIN");
-    console.log(req.body);
+    console.log(req.params);
 
     // validate
-    const {error} = validateUser(req.params);
+    /* const {error} = validateUser(req.params);
     if (error) {
         console.log('Validation error');
         
@@ -44,7 +44,7 @@ app.get('/api/users/:username/:password', (req, res) => {
         }
         return res.status(400).json(jsonRespond)
     }
-    console.log('Validation success');
+    console.log('Validation success'); */
 
     //check if username and password coreect
     console.log('Check existing username : ' + req.params.username + ' and password : ' + req.params.password);
@@ -61,10 +61,10 @@ app.get('/api/users/:username/:password', (req, res) => {
     }
 
     var jsonRespond = {
-        result: user,
+        result: users,
         message: "Login success"
     }
-    return res.json(jsonRespond);
+    return res.status(200).json(jsonRespond);
 });
 
 //Registration
@@ -89,22 +89,23 @@ app.post('/api/users', (req, res) => {
     console.log('Validation success');
 
     //check if username already exists
-    console.log('Check existing username : ' + req.body.username);
-    const check_user = users.find( u => u.username === req.body.username);
+    console.log('Check existing username : ' + req.body.username + ' , email : ' + req.body.email);
+    const check_user = users.find( u => u.username === req.body.username && u.email === req.body.email);
     if (check_user){
-        console.log('Username : ' + req.body.username + ' is already registered.');
+        console.log('Username : ' + req.body.username + ' and Email ' + req.body.email + ' is already registered.');
         
         var jsonRespond = {
             result: "", 
-            message: "Registration failed. Username " + req.body.username + " is already registered"
+            message: "Registration failed. Username : " + req.body.username + " and Email " + req.body.email +  "is already registered. Please use other username or email."
         }
         return res.status(404).json(jsonRespond);
     }
     
-    console.log('Username ' + req.body.username + ' is available');
+    console.log('Username : ' + req.body.username + ' and Email ' + req.body.email + ' is available');
     const user = {
         id: users.length + 1,
         username: req.body.username,
+        email: req.body.email,
         password: req.body.password
     };
 
@@ -119,6 +120,7 @@ app.listen(port, () => {
 
 function validateUser(user){
     const schema = Joi.object({
+        username: Joi.string().min(3),
         email: Joi.string().email({ minDomainAtoms: 2, tlds: { allow: ['com', 'net']}}),
         password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
     });
