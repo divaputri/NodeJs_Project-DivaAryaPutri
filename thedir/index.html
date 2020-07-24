@@ -3584,6 +3584,7 @@ Log In
 <div class="form-register">
 <form>
 <div class="font-size-md text-dark mb-5">Create Your Account</div>
+<div id="registration_result" style="margin-bottom:15px;color:grey;"></div>
 <div class="form-group mb-2">
 <label for="username-rt" class="sr-only">Username</label>
 <input id="username-rt" type="text" class="form-control" placeholder="Username">
@@ -3607,7 +3608,7 @@ Log In
 Terms Privacy Policy and</label>
 </div>
 </div>
-<button type="button" onclick="registrationUser();" class="btn btn-primary btn-block font-weight-bold text-uppercase font-size-lg rounded-sm">
+<button type="button" onclick="registrationUser()" class="btn btn-primary btn-block font-weight-bold text-uppercase font-size-lg rounded-sm">
 Create an
 account
 </button>
@@ -3924,6 +3925,16 @@ Automotive
 
         var url = "http://localhost:3000/api/users/" + login_username + "/" + login_password;
 
+        if (!login_username){
+            document.getElementById('registration_result').innerHTML = "Please input the username";
+            return false;
+        }
+
+        if (!login_password){
+            document.getElementById('registration_result').innerHTML = "Password cannot be empty";
+            return false;
+        }
+
         var data = {};
         data.username = login_username;
         data.password = login_password;
@@ -3949,19 +3960,38 @@ Automotive
 
 
     function registrationUser() {
-        register_username = document.getElementById('username-rt').value;
-        register_email = document.getElementById('email').value;
-        register_password = document.getElementById('password-rt').value;
-        register_retypePass = document.getElementById('r-password').value;
+        var register_username = document.getElementById('username-rt').value;
+        var register_email = document.getElementById('email').value;
+        var register_password = document.getElementById('password-rt').value;
+        var register_retypePass = document.getElementById('r-password').value;
+
+        if (!register_username){
+            document.getElementById('registration_result').innerHTML = "Username cannot be empty";
+            return false;
+        }
+
+        if (!register_email){
+            document.getElementById('registration_result').innerHTML = "Email cannot be empty";
+            return false;
+        }
+
+        if (!register_password){
+            document.getElementById('registration_result').innerHTML = "Password cannot be empty";
+            return false;
+        }
 
         if (register_password =! register_retypePass) {
             alert ('Your password does not match!');
-        } else {
-            var url = "localhost:3000/api/users";
+            return false
+        } 
 
-            var data = {};
+        var url = "localhost:3000/api/users";
+        
+        var data = {};
+            data.username = register_username;
             data.email = register_email;
             data.password = register_password;
+            data.retypePass = register_retypePass;
             var json = JSON.stringify(data);
 
             var xhr = XMLHttpRequest;
@@ -3979,8 +4009,7 @@ Automotive
                 document.getElementById('registration_result').innerHTML = respond.message;
                 }
             }
-            xhr.send(null);
-        }
+            xhr.send(null); 
     }
 </script>
 
