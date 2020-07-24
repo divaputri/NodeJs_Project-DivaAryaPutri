@@ -140,19 +140,11 @@ app.get("/api/listing/:id", (req, res) => {
     var datetime = new Date();
     console.log("\n" + datetime);
     console.log("Incoming new GET HTTP request");
-    console.log(req.body);
 
     const list = listing.find( l => l.id === parseInt(req.params.id));
     if ( !list ) res.status(404).send('ID not found.');
 
-    res.send(listing);
-    
-    /*console.log('List found');
-    var jsonRespond = {
-        return: list,
-        message: "List found"
-    }
-    return res.json(jsonRespond); */
+    res.json(list);
 });
 
 
