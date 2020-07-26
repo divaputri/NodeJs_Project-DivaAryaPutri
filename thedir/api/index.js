@@ -90,13 +90,13 @@ app.post('/api/users', (req, res) => {
 
     //check if username already exists
     console.log('Check existing username : ' + req.body.username + ' , email : ' + req.body.email);
-    const check_user = users.find( u => u.username === req.body.username && u.email === req.body.email);
+    const check_user = users.find( u => u.username === req.body.username || u.email === req.body.email);
     if (check_user){
         console.log('Username : ' + req.body.username + ' and Email ' + req.body.email + ' is already registered.');
         
         var jsonRespond = {
             result: "", 
-            message: "Registration failed. Username : " + req.body.username + " and Email " + req.body.email +  "is already registered. Please use other username or email."
+            message: "Registration failed. Username : " + req.body.username + " and Email " + req.body.email +  " is already registered. Please use other username or email."
         }
         return res.status(404).json(jsonRespond);
     }
@@ -115,10 +115,10 @@ app.post('/api/users', (req, res) => {
 
 
 const listing = [
-    {id: 1, name: 'Blooming Buds Bali', city: 'Denpasar', phone: '0812347321', address: 'Gunung Agung 48' , category: 'Shopping'},
-    {id: 2, name: 'Brownfox Waffle and Coffee', city: 'Denpasar', phone: '081802392', address: 'Raya Puputan No. 80', category: 'Food and Restaurant'},
-    {id: 3, name: 'Ayam Betutu khas Gilimanuk', city: 'Denpasar', phone: '03612183', address: 'Merdeka No.88', category: 'Food and Restaurant'},
-    {id: 4, name: 'Massimo Italian Restaurant', city: 'Denpasar', phone: '03612394', address: 'Danau Tamblingan No.228', category: 'Food and Restaurant'}
+    {id: 1, name: 'Blooming Buds Bali', city: 'Denpasar', phone: '0812347321', address: 'Gunung Agung 48' , website: 'bloomingbuds@yahoo.com'},
+    {id: 2, name: 'Brownfox Waffle and Coffee', city: 'Denpasar', phone: '081802392', address: 'Raya Puputan No. 80', website: 'brownfox@gmail.co.id'},
+    {id: 3, name: 'Ayam Betutu khas Gilimanuk', city: 'Denpasar', phone: '03612183', address: 'Merdeka No.88', website: 'ayamgiilimanuk@gmail.com'},
+    {id: 4, name: 'Massimo Italian Restaurant', city: 'Denpasar', phone: '03612394', address: 'Danau Tamblingan No.228', website: 'massimogelato@yahoo.com'}
 ];
 
 // LIST ALL directory
@@ -165,7 +165,7 @@ app.post("/api/listing", (req, res) => {
         city: req.body.city,
         phone: req.body.phone,
         address: req.body.address,
-        category: req.body.category
+        website: req.body.website
     };
     listing.push(list);
     console.log('Add post success');
@@ -195,7 +195,7 @@ app.put('/api/listing/:id', (req, res) => {
         list.city = req.body.city,
         list.phone = req.body.phone,
         list.address = req.body.address,
-        list.category = req.body.category
+        list.website =  req.body.website
 
         console.log('Update success!');
         var jsonRespond = {
@@ -213,7 +213,11 @@ app.delete('/api/listing/:id', (req, res) => {
     const index = listing.indexOf(list);
     listing.splice(index, 1);
     console.log('Delete success');
-    return res.json(json);
+    var jsonRespond = {
+        result: list,
+        message: "Delete success"
+    }
+    return res.json(jsonRespond);
 });
 
 
@@ -233,11 +237,11 @@ function validateUser(user){
 
 function validateList(list){
     const schema = Joi.object({
-        name: Joi.string().min(3).required,
-        city:Joi.string().min(5).required,
-        phone: Joi.string().min(4).required,
-        address: Joi.string().min(8).required,
-        category: Joi.string().min(5).required
+        name: Joi.string().min(3).required(),
+        city:Joi.string().min(5).required(),
+        phone: Joi.string().min(4).required(),
+        address: Joi.string().min(8).required(),
+        website: Joi.string().email({ minDomainSegments : 2, tlds: { allow: ['com', 'co.id']}})
     });
     return schema.validate(list);
 }

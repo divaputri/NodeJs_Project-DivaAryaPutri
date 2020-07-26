@@ -353,7 +353,7 @@ this submission.
 <div class="text-dark font-weight-semibold font-size-md mb-2 lh-15">Listing Tittle
 <a href="#" class="text-darker-light d-inline-block ml-2" data-toggle="tooltip" data-placement="top" title="Title for listing"><i class="fas fa-question-circle"></i></a>
 </div>
-<input type="text" class="form-control" placeholder="Staple & Fancy Hotel">
+<input type="text"  id="name" class="form-control" placeholder="Staple & Fancy Hotel">
 <input type="text" class="form-control" placeholder="Tagline Example: Best Express Mexican Grill">
 </div>
 <div class="form-group mb-4">
@@ -590,7 +590,7 @@ Already Have Account?
 </label>
 </div>
 </div>
-<button type="button" class="btn btn-primary btn-block font-size-h5 lh-19 mt-2">Save & Preview</button>
+<button type="button"  onclick="addListing()" class="btn btn-primary btn-block font-size-h5 lh-19 mt-2">Save & Preview</button>
 </div>
 </div>
 </form>
@@ -1217,5 +1217,34 @@ Automotive
 </symbol>
 </defs>
 </svg>
+
+<script>
+    function addListing(){
+        add_name = document.getElementById('name').value;
+        add_city = document.getElementById('city').value;
+        add_phone = document.getElementById('phone').value;
+        add_address = document.getElementById('address').value;
+        add_website = document.getElementById('website').value;
+
+        var url = "http://localhost:3000/api/listing";
+
+        var data = {};
+        data.name = add_name;
+        data.city = add_city;
+        data.phone = add_phone;
+        data.address = add_address;
+        data.website = add_website;
+
+        var xhr = XMLHttpRequest;
+        xhr.OPEN('POST', url, true );
+        xhr.onload = function() {
+            if (xhr.readyState == 4 && xhr.status == "200") {
+                document.getElementById('registration_result').innerHTML = 'Data has been saved successfully.';
+            }
+        }
+        xhr.send(JSON);
+    }
+</script>
+
 </body>
 </html>
