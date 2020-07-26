@@ -19,12 +19,10 @@ const users = [
 
 
 app.get('/api/users', (req, res) => {
-    //log time
     var datetime = new Date();
     console.log("\n" + datetime);
     console.log('User data has been retrieved');
     return res.json(users);
-
 });
 
 app.get('/api/users/:username/:password', (req, res) => {
@@ -45,13 +43,13 @@ app.get('/api/users/:username/:password', (req, res) => {
         }
         return res.status(400).json(jsonRespond)
     }
-    console.log('Validation success');
+    console.log('Validation success and accepted');
 
     //check if username and password coreect
     console.log('Check existing username : ' + req.params.username + ' and password : ' + req.params.password);
     const check_user = users.find( u => u.username === req.params.username && u.password === req.params.password);
     if (!check_user){
-        var error_message = 'Incorrect username or password is not corret';
+        var error_message = 'Incorrect username or password';
         console.log(error_message);
 
         var jsonRespond = {
@@ -61,6 +59,7 @@ app.get('/api/users/:username/:password', (req, res) => {
         return res.status(400).json(jsonRespond);
     }
 
+    console.log('Username ' + req.params.username + ' sucessfully login.');
     var jsonRespond = {
         result: users,
         message: "Login success"
@@ -124,17 +123,13 @@ const listing = [
 
 // LIST ALL directory
 app.get("/api/listing", (req, res) => {
-    //res.setHeader('Access-Control-Allow-Origin', '*');
-    //res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
     var datetime = new Date();
     console.log("\n" + datetime);
     console.log('Listing success');
     return res.json(listing);
-
-    //res.send(listing);
 });
 
+//List a directory
 app.get("/api/listing/:id", (req, res) => {
 
     var datetime = new Date();
@@ -143,8 +138,82 @@ app.get("/api/listing/:id", (req, res) => {
 
     const list = listing.find( l => l.id === parseInt(req.params.id));
     if ( !list ) res.status(404).send('ID not found.');
+    console.log('List found');
+    var jsonRespond = {
+        result: list,
+        message: "List found"
+    }
+    return res.json(jsonRespond);
+});
 
-    res.json(list);
+// Add new directory
+app.post("/api/listing", (req, res) => {
+
+    var datetime = new Date();
+    console.log("\n" + datetime);
+    console.log("Incoming new GET HTTP request");
+    console.log(req.body);
+
+    const {error} = validateList(req.body);
+    if(error) {
+        return req.status(400).send(Error.detail[0].message);
+    }
+
+    const list = {
+        id: listing.length + 1,
+        name: req.body.name,
+        city: req.body.city,
+        phone: req.body.phone,
+        address: req.body.address,
+        category: req.body.category
+    };
+    listing.push(list);
+    console.log('Add post success');
+    var jsonRespond ={
+        result: list,
+        message: "Add post success"
+    }
+    return res.json(jsonRespond);
+});
+
+//Edit directory
+app.put('/api/listing/:id', (req, res) => {
+    var datetime = new Date();
+    console.log("\n" + datetime);
+    console.log("Incoming new GET HTTP request");
+    console.log(req.body);
+
+    const {error} = validateList(req.body);
+    if (error) {
+        return res.status(400).send(error.details[0].message);
+    }
+
+    const list = listing.find( l => l.id === parseInt(req.params.id));
+    if(!list) return res.status(400).send('ID not found.');
+
+        list.name = req.body.name,
+        list.city = req.body.city,
+        list.phone = req.body.phone,
+        list.address = req.body.address,
+        list.category = req.body.category
+
+        console.log('Update success!');
+        var jsonRespond = {
+            result: list,
+            message: 'Update success!' 
+        }
+        return res.json(jsonRespond);
+});
+
+//Delete directory
+app.delete('/api/listing/:id', (req, res) => {
+    const list  = listing.find( l => l.id === parseInt(req.params.id));
+    if(!list) return res.status(400).send('ID not found.');
+    
+    const index = listing.indexOf(list);
+    listing.splice(index, 1);
+    console.log('Delete success');
+    return res.json(json);
 });
 
 
@@ -160,4 +229,15 @@ function validateUser(user){
         password: Joi.string().pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
     });
     return schema.validate(user);
+}
+
+function validateList(list){
+    const schema = Joi.object({
+        name: Joi.string().min(3).required,
+        city:Joi.string().min(5).required,
+        phone: Joi.string().min(4).required,
+        address: Joi.string().min(8).required,
+        category: Joi.string().min(5).required
+    });
+    return schema.validate(list);
 }

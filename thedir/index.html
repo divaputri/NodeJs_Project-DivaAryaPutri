@@ -3949,10 +3949,13 @@ Automotive
             if (xhr.readyState == 4 && xhr.status == "200") {
                 //console.log(respond);
                 document.getElementById('registration_result').innerHTML = respond.message;
+                window.location.assign("index.html");
+                window.alert("Login Successful! Welcome!")
             } else {
                 console.error(respond);
                 //alert(respond.message);
                 document.getElementById('registration_result').innerHTML = respond.message;
+                //window.alert("Sorry, please input the correct username and password")
             }
         }
         xhr.send(null);
